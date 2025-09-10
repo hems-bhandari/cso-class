@@ -1,0 +1,290 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>An Interactive Guide to RISC-V Instructions</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+    <nav class="sidebar">
+        <h2>Sections</h2>
+        <ul>
+            <li><a href="#intro">Introduction</a></li>
+            <li><a href="#arch">Computer Architecture</a></li>
+            <li><a href="#assembly">Assembly Basics</a></li>
+            <li><a href="#memory-ops">Memory Operations</a></li>
+            <li><a href="#encoding">Instruction Encoding</a></li>
+            <li><a href="#control-flow">Control Flow</a></li>
+            <li><a href="#principles">Design Principles</a></li>
+        </ul>
+    </nav>
+
+    <main class="content">
+        <header>
+            <h1>An Interactive Guide to RISC-V Instructions</h1>
+            <p>A beginner-friendly breakdown of the concepts presented in the "T3 RISC-V Instructions" slides.</p>
+        </header>
+
+        <section id="intro">
+            <h2>1. Introduction to RISC-V</h2>
+            <div class="card">
+                <p>RISC-V is an <strong class="tooltip"
+                        data-tooltip="Anyone can use, modify, and distribute the design without paying licensing fees.">open-source</strong>
+                    Instruction Set Architecture (ISA). Think of an ISA as the fundamental language a computer processor
+                    understands.</p>
+                <ul>
+                    <li><strong>RISC</strong> stands for <strong class="tooltip"
+                            data-tooltip="An approach that favors a small, simple set of instructions that all take about the same amount of time to execute.">Reduced
+                            Instruction Set Computer</strong>. The goal is simplicity and speed.</li>
+                    <li>It was developed at the <strong>University of California, Berkeley</strong>, with key
+                        contributions from figures like Krste Asanović and David Patterson.</li>
+                    <li>Unlike architectures like x86 or ARM, its open nature allows anyone to build processors,
+                        fostering innovation and competition.</li>
+                </ul>
+            </div>
+        </section>
+
+        <section id="arch">
+            <h2>2. Basic Computer Architecture</h2>
+            <div class="card">
+                <h3>The Core Components</h3>
+                <p>A computer has two main parts that are in constant communication: the Processor and Memory.</p>
+                <div class="arch-diagram">
+                    <div class="arch-box">
+                        <strong>Processor (CPU)</strong>
+                        <p>The "brain". Executes instructions.</p>
+                        <ul>
+                            <li><strong>Registers (t0, s1, etc.):</strong> Tiny, ultra-fast storage locations for data
+                                the CPU is currently working on.</li>
+                            <li><strong>ALU (Arithmetic Logic Unit):</strong> The calculator. Performs math (+, -) and
+                                logic (AND, OR).</li>
+                            <li><strong>PC (Program Counter):</strong> A special register that keeps track of the memory
+                                address of the next instruction to execute.</li>
+                        </ul>
+                    </div>
+                    <div class="buses">
+                        <span>&leftrightarrow; Address Bus &leftrightarrow;</span>
+                        <span>&leftrightarrow; Data Bus &leftrightarrow;</span>
+                    </div>
+                    <div class="arch-box">
+                        <strong>Memory (RAM)</strong>
+                        <p>The "workspace". Stores instructions and data.</p>
+                        <p>Organized as a huge list of numbered slots (addresses), where each slot holds one byte of
+                            data.</p>
+                    </div>
+                </div>
+                <p>They communicate via <strong>Buses</strong>: the Address Bus says *where* to get data, and the Data
+                    Bus carries the actual data.</p>
+            </div>
+        </section>
+
+        <section id="assembly">
+            <h2>3. RISC-V Assembly Language Basics</h2>
+            <div class="card">
+                <h3>Arithmetic Operations</h3>
+                <p>RISC-V uses a simple "three-operand" format: `instruction dest, src1, src2`.</p>
+                <pre><code>// Adds values in s1 and s2, stores result in t0
+add t0, s1, s2      # t0 = s1 + s2
+
+// Subtracts value in s2 from s1, stores result in t0
+sub t0, s1, s2      # t0 = s1 - s2
+
+// Adds a constant (immediate) value of 20 to s1
+addi t0, s1, 20     # t0 = s1 + 20</code></pre>
+
+                <h3>What are Registers?</h3>
+                <p>RISC-V has 32 general-purpose registers, each 32 bits wide (a "word"). The compiler decides how to
+                    use them, but they have conventional names:</p>
+                <ul>
+                    <li><code>t0-t6</code>: Temporary registers for short-term calculations.</li>
+                    <li><code>s0-s11</code>: Saved registers to hold important variables.</li>
+                    <li><code>zero (x0)</code>: A special register that is hardwired to always contain the value 0. It's
+                        very useful!</li>
+                </ul>
+            </div>
+        </section>
+
+        <section id="memory-ops">
+            <h2>4. Interacting with Memory</h2>
+            <div class="card">
+                <h3>Load and Store: The Bridge to Memory</h3>
+                <p>The ALU can only operate on data in registers. To work with data in memory, we must first load it
+                    into a register and then store it back when done.</p>
+                <ul>
+                    <li><code>lw</code> (Load Word): Copies 4 bytes (a word) <strong>from Memory to a Register</strong>.
+                    </li>
+                    <li><code>sw</code> (Store Word): Copies 4 bytes (a word) <strong>from a Register to
+                            Memory</strong>.</li>
+                </ul>
+                <h3>Displacement Addressing</h3>
+                <p>How do we specify a memory address? We use a base address (in a register) and an offset (a constant).
+                </p>
+                <pre><code>lw t0, 8(s1)</code></pre>
+                <p><strong>Translation:</strong> "Get the memory address stored in register <code>s1</code>, add
+                    <code>8</code> bytes to it, and load the word from that final address into register
+                    <code>t0</code>."</p>
+                <p>This is extremely useful for arrays. If <code>s1</code> holds the start of an integer array `A`, then
+                    `8(s1)` points to the 3rd element, `A[2]`, since each integer is 4 bytes.</p>
+
+                <div class="interactive-diagram" id="lw-sw-diagram">
+                    <h4>Execution Flow (Click to Animate)</h4>
+                    <div class="proc-mem">
+                        <div class="cpu">
+                            <p><strong>Processor</strong></p>
+                            <div class="reg" id="reg-s1">s1: 0x10001000</div>
+                            <div class="reg" id="reg-t0">t0: ?</div>
+                            <div class="alu-op" id="alu-op">+ 8</div>
+                        </div>
+                        <div class="memory">
+                            <p><strong>Memory</strong></p>
+                            <div class="mem-cell" data-addr="0x1000100C">...</div>
+                            <div class="mem-cell" data-addr="0x10001008" id="target-mem"><strong>Value: 1234</strong>
+                            </div>
+                            <div class="mem-cell" data-addr="0x10001004">...</div>
+                            <div class="mem-cell" data-addr="0x10001000">...</div>
+                        </div>
+                    </div>
+                    <div class="bus" id="address-bus">Address Bus</div>
+                    <div class="bus" id="data-bus">Data Bus</div>
+                    <div class="packet" id="address-packet">0x10001008</div>
+                    <div class="packet" id="data-packet">1234</div>
+                    <button onclick="animateLw()">Animate `lw t0, 8(s1)`</button>
+                </div>
+            </div>
+        </section>
+
+        <section id="encoding">
+            <h2>5. Instruction Encoding (Machine Code)</h2>
+            <div class="card">
+                <p>Instructions like <code>add t0, s1, s2</code> are for humans. The processor only understands binary.
+                    Every instruction is encoded into a 32-bit word. The layout of these bits is defined by the
+                    <strong>instruction format</strong>.</p>
+
+                <div class="tabs">
+                    <button class="tab-link active" onclick="openFormat(event, 'r-type')">R-Type</button>
+                    <button class="tab-link" onclick="openFormat(event, 'i-type')">I-Type</button>
+                    <button class="tab-link" onclick="openFormat(event, 's-type')">S-Type</button>
+                    <button class="tab-link" onclick="openFormat(event, 'b-type')">B-Type</button>
+                </div>
+
+                <div id="r-type" class="tab-content" style="display:block;">
+                    <h3>R-Type (Register)</h3>
+                    <p>Used for register-to-register operations like <code>add</code> and <code>sub</code>.</p>
+                    <p>Example: <code>add t0, s1, s2</code></p>
+                    <div class="format-visualizer">
+                        <div class="field" data-info="Specifies the operation (e.g., add vs sub).">funct7</div>
+                        <div class="field" data-info="Second source register (s2).">rs2</div>
+                        <div class="field" data-info="First source register (s1).">rs1</div>
+                        <div class="field" data-info="More operation details.">funct3</div>
+                        <div class="field" data-info="Destination register (t0).">rd</div>
+                        <div class="field" data-info="Main operation code. For R-Type, this is always 0110011.">opcode
+                        </div>
+                    </div>
+                </div>
+
+                <div id="i-type" class="tab-content">
+                    <h3>I-Type (Immediate)</h3>
+                    <p>Used for operations with an immediate (constant) value, like <code>addi</code> and
+                        <code>lw</code>.</p>
+                    <p>Example: <code>lw t0, 8(s1)</code></p>
+                    <div class="format-visualizer">
+                        <div class="field large" data-info="The 12-bit constant value (e.g., 8).">immediate</div>
+                        <div class="field" data-info="Source/Base register (s1).">rs1</div>
+                        <div class="field" data-info="Function code.">funct3</div>
+                        <div class="field" data-info="Destination register (t0).">rd</div>
+                        <div class="field" data-info="Main operation code. For lw, this is 0000011.">opcode</div>
+                    </div>
+                </div>
+
+                <div id="s-type" class="tab-content">
+                    <h3>S-Type (Store)</h3>
+                    <p>Used for store operations like <code>sw</code>.</p>
+                    <p>Example: <code>sw t0, 8(s1)</code></p>
+                    <div class="format-visualizer">
+                        <div class="field" data-info="Upper bits of the immediate value.">imm[11:5]</div>
+                        <div class="field" data-info="Source register (the data to store, t0).">rs2</div>
+                        <div class="field" data-info="Base address register (s1).">rs1</div>
+                        <div class="field" data-info="Function code.">funct3</div>
+                        <div class="field" data-info="Lower bits of the immediate value.">imm[4:0]</div>
+                        <div class="field" data-info="Main operation code. For sw, this is 0100011.">opcode</div>
+                    </div>
+                </div>
+
+                <div id="b-type" class="tab-content">
+                    <h3>B-Type (Branch)</h3>
+                    <p>Used for conditional branches like <code>bne</code> (Branch if Not Equal).</p>
+                    <p>Example: <code>bne s1, s2, Loop</code></p>
+                    <div class="format-visualizer">
+                        <div class="field" data-info="Bits of the branch offset.">imm[12|10:5]</div>
+                        <div class="field" data-info="Second register to compare (s2).">rs2</div>
+                        <div class="field" data-info="First register to compare (s1).">rs1</div>
+                        <div class="field" data-info="Condition type (e.g., 'not equal').">funct3</div>
+                        <div class="field" data-info="More bits of the branch offset.">imm[4:1|11]</div>
+                        <div class="field" data-info="Opcode for branches (1100011).">opcode</div>
+                    </div>
+                </div>
+                <div id="format-info-box">Hover over a field to see its description.</div>
+            </div>
+        </section>
+
+        <section id="control-flow">
+            <h2>6. Instructions for Making Decisions (Control Flow)</h2>
+            <div class="card">
+                <p>How does a program execute an `if-else` statement? With conditional branches.</p>
+                <pre><code>// C Code
+if (i == j) {
+    f = g + h;
+} else {
+    f = g - h;
+}
+
+// RISC-V Assembly (assuming i=s3, j=s4, f=s0, g=s1, h=s2)
+    bne s3, s4, Else      # If i != j, branch to the Else label
+    add s0, s1, s2      # This is the 'if' block. f = g + h
+    jal zero, EndIf     # Jump over the 'else' block
+Else:
+    sub s0, s1, s2      # This is the 'else' block. f = g - h
+EndIf:
+    # ... execution continues
+</code></pre>
+                <ul>
+                    <li><code>bne</code> (Branch if Not Equal): A B-Type instruction. It compares two registers. If the
+                        condition is met, it changes the Program Counter (PC) to jump to a different location in the
+                        code.</li>
+                    <li><code>jal</code> (Jump and Link): An unconditional jump. We use `jal zero, ...` to simply "go
+                        to" a label without needing to return.</li>
+                </ul>
+            </div>
+        </section>
+
+        <section id="principles">
+            <h2>7. Core Design Principles</h2>
+            <div class="card">
+                <h3>Registers vs. Memory</h3>
+                <p>Accessing registers is hundreds of times faster than accessing main memory. Think of registers as
+                    ingredients you're holding, and memory as the pantry. You want to keep what you need most often in
+                    your hands.</p>
+                <ul>
+                    <li><strong>Principle:</strong> Good compilers work hard to keep variables in registers as much as
+                        possible. This "register optimization" is crucial for performance.</li>
+                </ul>
+                <h3>Design Principle 3: Make the Common Case Fast</h3>
+                <p>Programs use small constant numbers all the time (e.g., incrementing a loop counter by 1). Instead of
+                    forcing the processor to load these constants from memory (which is slow), RISC-V provides immediate
+                    instructions like `addi`.</p>
+                <ul>
+                    <li>By embedding the small constant directly into the instruction (I-Type), we avoid a slow memory
+                        access, making the common case much faster.</li>
+                </ul>
+            </div>
+        </section>
+
+    </main>
+
+    <script src="script.js"></script>
+</body>
+
+</html>

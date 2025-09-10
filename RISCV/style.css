@@ -1,0 +1,224 @@
+@import url('https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap');
+
+:root {
+    --primary-color: #005A9C;
+    --secondary-color: #f4f4f4;
+    --text-color: #333;
+    --bg-color: #ffffff;
+    --border-color: #ddd;
+    --accent-color: #ffc107;
+}
+
+body {
+    font-family: 'Roboto', sans-serif;
+    line-height: 1.6;
+    color: var(--text-color);
+    background-color: var(--bg-color);
+    margin: 0;
+    display: flex;
+}
+
+.sidebar {
+    width: 220px;
+    background: var(--secondary-color);
+    padding: 20px;
+    height: 100vh;
+    position: fixed;
+    border-right: 1px solid var(--border-color);
+}
+
+.sidebar h2 {
+    color: var(--primary-color);
+    border-bottom: 2px solid var(--primary-color);
+    padding-bottom: 10px;
+}
+
+.sidebar ul {
+    list-style: none;
+    padding: 0;
+}
+
+.sidebar ul li a {
+    text-decoration: none;
+    color: var(--text-color);
+    display: block;
+    padding: 10px;
+    border-radius: 5px;
+    transition: background-color 0.3s;
+}
+
+.sidebar ul li a:hover {
+    background-color: #e2e2e2;
+}
+
+.content {
+    margin-left: 240px;
+    padding: 20px 40px;
+    max-width: 900px;
+}
+
+header {
+    border-bottom: 2px solid var(--border-color);
+    margin-bottom: 30px;
+    padding-bottom: 20px;
+}
+
+header h1 {
+    color: var(--primary-color);
+}
+
+section {
+    margin-bottom: 40px;
+}
+
+h2 {
+    color: var(--primary-color);
+    border-bottom: 1px solid var(--border-color);
+    padding-bottom: 5px;
+    margin-top: 0;
+}
+
+.card {
+    background: var(--secondary-color);
+    border-radius: 8px;
+    padding: 20px;
+    border: 1px solid var(--border-color);
+    box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+}
+
+pre {
+    background: #2d2d2d;
+    color: #f2f2f2;
+    padding: 15px;
+    border-radius: 5px;
+    overflow-x: auto;
+}
+
+code {
+    font-family: 'Courier New', Courier, monospace;
+}
+
+/* Tooltip */
+.tooltip {
+    position: relative;
+    cursor: pointer;
+    border-bottom: 1px dotted var(--primary-color);
+}
+
+.tooltip::after {
+    content: attr(data-tooltip);
+    position: absolute;
+    bottom: 125%;
+    left: 50%;
+    transform: translateX(-50%);
+    background: #333;
+    color: #fff;
+    padding: 5px 10px;
+    border-radius: 5px;
+    font-size: 0.9em;
+    white-space: nowrap;
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity 0.3s, visibility 0.3s;
+    z-index: 10;
+}
+
+.tooltip:hover::after {
+    opacity: 1;
+    visibility: visible;
+}
+
+/* Architecture Diagram */
+.arch-diagram {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 15px;
+}
+.arch-box {
+    border: 2px solid var(--primary-color);
+    padding: 15px;
+    border-radius: 5px;
+    text-align: center;
+    flex-basis: 45%;
+}
+.buses {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    font-size: 0.9em;
+    color: #666;
+}
+
+/* Instruction Format Visualizer */
+.tabs {
+    overflow: hidden;
+    border-bottom: 1px solid var(--border-color);
+    margin-bottom: 15px;
+}
+.tab-link {
+    background-color: inherit;
+    float: left;
+    border: none;
+    outline: none;
+    cursor: pointer;
+    padding: 14px 16px;
+    transition: 0.3s;
+    font-size: 1em;
+}
+.tab-link:hover {
+    background-color: #e2e2e2;
+}
+.tab-link.active {
+    background-color: var(--border-color);
+    border-bottom: 2px solid var(--primary-color);
+}
+.tab-content { display: none; }
+
+.format-visualizer {
+    display: flex;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    margin-top: 10px;
+    text-align: center;
+    font-size: 0.9em;
+}
+.format-visualizer .field {
+    padding: 10px;
+    border-left: 1px solid #ccc;
+    flex-grow: 1;
+    cursor: pointer;
+    transition: background-color 0.2s;
+}
+.format-visualizer .field:first-child { border-left: none; }
+.format-visualizer .field:hover { background-color: var(--accent-color); }
+.format-visualizer .field.large { flex-grow: 2; }
+
+#format-info-box {
+    margin-top: 15px;
+    padding: 10px;
+    background-color: #e7f3fe;
+    border-left: 4px solid var(--primary-color);
+    font-style: italic;
+    color: #31708f;
+}
+
+/* Animation Diagram */
+.interactive-diagram { position: relative; height: 250px; }
+.proc-mem { display: flex; justify-content: space-around; }
+.cpu, .memory { border: 1px solid #333; padding: 10px; width: 40%; }
+.reg, .mem-cell { background: #e9e9e9; margin: 5px 0; padding: 5px; }
+.bus { position: absolute; width: 80%; left: 10%; text-align: center; background: #fafafa; border: 1px dashed #999; padding: 5px; z-index: 1; }
+#address-bus { top: 120px; }
+#data-bus { top: 160px; }
+.packet {
+    position: absolute;
+    background: var(--accent-color);
+    padding: 5px 8px;
+    border-radius: 4px;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.3);
+    z-index: 2;
+    opacity: 0;
+    font-size: 0.9em;
+    font-weight: bold;
+}
